@@ -13,7 +13,7 @@ import cookieParser from 'cookie-parser';
 import RoomRouter from './Routers/RoomsRouter.js';
 app.use(cookieParser());
 app.use(cors({
-    origin: 'http://localhost:5173', // Frontend URL
+    origin: 'https://codershouse-frontend.vercel.app', // Frontend URL
     credentials: true, // Allow sending cookies
 }));
 app.use('/uploads',express.static('./uploads'));
