@@ -1,0 +1,5 @@
+{
+"version": 2,
+"builds": [{ "src": "findex.js","use": "@vercel/node"}],
+"routes":[{"src":"/(.*)","dest":"/"}]
+}
