@@ -1,16 +1,17 @@
 
 import { TokenModel } from "../Models/TokenModel.js";
+import getUrl from "../services/GetUrl.js";
 import HashService from "../services/Hash_service.js";
 import OtpService from "../services/OtpService.js";
 import tokenService from "../services/tokenService.js";
 import UserService from "../services/UserService.js";
-
+import cloudinary from 'cloudinary'
 const OtpController = {
     async SendOtp(req, res, next) {
-        // const phone = req.body?.phone;
+        // const email = req.body?.email;
         const email=req.body?.email
         if (!email) {
-            res.json({ msg: "Please Enter Phone number or email", status: 0 })
+            res.json({ msg: "Please Enter phone number or email", status: 0 })
         }
         const otp = OtpService.generateOtp();
         const ttl = 1000 * 60 * 2; //time to leave 2 min
@@ -36,25 +37,25 @@ const OtpController = {
 
     },
     async verifyOtp(req, res) {
-        const { hash, phone, otp } = req.body;
-        if (!hash || !phone || !otp) {
+        const { hash, email, otp } = req.body;
+        if (!hash || !email || !otp) {
             res.json({ msg: "All fields are required", status: 0 })
         }
         const [hashed, expires] = hash.split('.');
         if (Date.now() > Number(expires)) {
             res.json({ msg: "Otp is expired ", status: 0 })
         }
-        const data = `${phone}.${otp}.${expires}`
+        const data = `${email}.${otp}.${expires}`
         if (!OtpService.verifyOtp(hashed, data)) {
             res.json({ msg: "Invalid Otp", status: 0 });
         }
         let user;
 
-        user = await UserService.findUser({ phone: phone })
+        user = await UserService.findUser({ email: email })
         if (!user) {
-            user = await UserService.createUser({ phone: phone });
+            user = await UserService.createUser({ email: email });
         }
-        const { accessToken, refreshToken } = tokenService.createToken({ phone: user.phone, Activated: user.Activated, userId: user._id });
+        const { accessToken, refreshToken } = tokenService.createToken({ email: user.email, Activated: user.Activated, userId: user._id });
         res.cookie('refreshToken', refreshToken, {
             maxAge: 1000 * 60 * 60 * 24 * 30,
             httpOnly: true,
@@ -74,10 +75,10 @@ const OtpController = {
             const fileBuffer=getUrl(file);
             const cloud=await cloudinary.v2.uploader.upload(fileBuffer.content)
             console.log(cloud);
-            const prod=await new SingleProductCloudModel({
-                public_id:cloud.public_id,
-                url:cloud.secure_url
-            })
+            // const prod=await new SingleProductCloudModel({
+            //     public_id:cloud.public_id,
+            //     url:cloud.secure_url
+            // })
             user = await UserService.updateUser({ _id: req.user._id }, {
                 public_id:cloud.public_id,
                 fullName: req.body.FullName,

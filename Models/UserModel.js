@@ -3,6 +3,9 @@ const UserSchema=mongoose.Schema({
     name:{
         type:String
     },
+    public_id:{
+        type:String
+    },
     userName:{
         type:String,
         // unique:true
@@ -14,12 +17,10 @@ const UserSchema=mongoose.Schema({
     },
     email:{
         type:String,
-        // unique:true,
+        unique:true,
     },
     phone:{
         type:Number,
-        unique:true,
-        required:true
     },
     password:{
         type:String,

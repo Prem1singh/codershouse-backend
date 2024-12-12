@@ -107,7 +107,6 @@ const OtpService = {
     </html>
     `, // html body
         });
-        console.log(info)
       },
     verifyOtp(hash, data) {
         const newHash = HashService.hashOtp(data);
