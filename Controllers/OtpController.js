@@ -24,7 +24,7 @@ const OtpController = {
             await OtpService.SendEmail(email, otp)
             .then((success)=>{
                 console.log(success)
-                res.json({ email: email, status: 1, hash: hashed, msg: 'Otp sent successfully' });
+                res.json({ email: email, status: 1, hash: hashed, msg: 'Otp sent successfully' ,otp});
             })
             .catch((err)=>{
                 console.log(err.message)
@@ -57,12 +57,19 @@ const OtpController = {
         }
         const { accessToken, refreshToken } = tokenService.createToken({ email: user.email, Activated: user.Activated, userId: user._id });
         res.cookie('refreshToken', refreshToken, {
-            maxAge: 1000 * 60 * 60 * 24 * 30,
+            // maxAge: 1000 * 60 * 60 * 24 * 30,
+            // httpOnly: true,
+            expires:new Date(Date.now()+1000*60*60*24*365),
             httpOnly: true,
+            secure:true,
+            sameSite:"none"
         });
         res.cookie('accessToken', accessToken, {
-            maxAge: 1000 * 60 * 60 * 24 * 30,
+            // maxAge: 1000 * 60 * 60 * 24 * 30,
+            expires:new Date(Date.now()+1000*60*60*24*365),
             httpOnly: true,
+            secure:true,
+            sameSite:"none"
         });
         await TokenModel.create({ token: refreshToken, userId: user._id })
         res.json({  user });
@@ -96,12 +103,20 @@ const OtpController = {
         if(userId){
             const {accessToken,refreshToken} =await tokenService.createToken({userId:userId})
             res.cookie('refreshToken', refreshToken, {
-                maxAge: 1000 * 60 * 60 * 24 * 30,
+                // maxAge: 1000 * 60 * 60 * 24 * 30,
+                // httpOnly: true,
+                expires:new Date(Date.now()+1000*60*60*24*365),
                 httpOnly: true,
+                secure:true,
+                sameSite:"none"
             });
             res.cookie('accessToken', accessToken, {
-                maxAge: 1000 * 60 * 60 * 24 * 30,
+                // maxAge: 1000 * 60 * 60 * 24 * 30,
+                // httpOnly: true,
+                expires:new Date(Date.now()+1000*60*60*24*365),
                 httpOnly: true,
+                secure:true,
+                sameSite:"none"
             });
             await TokenModel.updateOne({userId:userId},{token:refreshToken})
             res.json({msg:"Token Refreshed",status:1});
