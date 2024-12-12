@@ -7,21 +7,30 @@ import UserService from "../services/UserService.js";
 
 const OtpController = {
     async SendOtp(req, res, next) {
-        const phone = req.body.phone;
-        if (!phone) {
-            res.json({ msg: "Please Enter Phone number", status: 0 })
+        // const phone = req.body?.phone;
+        const email=req.body?.email
+        if (!email) {
+            res.json({ msg: "Please Enter Phone number or email", status: 0 })
         }
         const otp = OtpService.generateOtp();
         const ttl = 1000 * 60 * 2; //time to leave 2 min
         const expires = Date.now() + ttl;
-        const data = `${phone}.${otp}.${expires}`
+        const data = `${email}.${otp}.${expires}`;
         const hash = HashService.hashOtp(data);
         const hashed = `${hash}.${expires}`;
+        console.log(hashed,email)
         try {
-            await OtpService.sendBySms(phone, otp)
-            res.json({ phone: phone, status: 1, hash: hashed, otp: otp, msg: 'Otp sent successfully' });
+            await OtpService.SendEmail(email, otp)
+            .then((success)=>{
+                console.log(success)
+                res.json({ email: email, status: 1, hash: hashed, msg: 'Otp sent successfully' });
+            })
+            .catch((err)=>{
+                console.log(err.message)
+            })
         }
         catch (err) {
+            console.log(err)
             res.json({ msg: "Unable to send otp", status: 0 });
         }
 
@@ -61,9 +70,18 @@ const OtpController = {
         let user=req.user;
         
         if (req.body.FullName && req.file) {
+            const file=req.file;
+            const fileBuffer=getUrl(file);
+            const cloud=await cloudinary.v2.uploader.upload(fileBuffer.content)
+            console.log(cloud);
+            const prod=await new SingleProductCloudModel({
+                public_id:cloud.public_id,
+                url:cloud.secure_url
+            })
             user = await UserService.updateUser({ _id: req.user._id }, {
+                public_id:cloud.public_id,
                 fullName: req.body.FullName,
-                Avatar: `/uploads/${req.file.filename}`,
+                Avatar: cloud.secure_url,
                 Activated:true,
             })
           

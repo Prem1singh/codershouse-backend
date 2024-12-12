@@ -3,11 +3,8 @@ import connection from './connection.js'
 import dotenv from 'dotenv'
 import UserRouter from './Routers/UserRouter.js';
 import AuthRouter from './Routers/AuthRouter.js';
-
-
-import cors from 'cors'
-
 dotenv.config();
+import cors from 'cors'
 const app=express();
 import cookieParser from 'cookie-parser';
 import RoomRouter from './Routers/RoomsRouter.js';
