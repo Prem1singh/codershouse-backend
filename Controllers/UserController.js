@@ -14,8 +14,16 @@ const UserController={
         if(req.user){
             const { accessToken,refreshToken } = req.cookies;
             await TokenModel.deleteMany({userId:req.user._id})
-            res.clearCookie("accessToken");
-            res.clearCookie("refreshToken");
+            res.clearCookie("accessToken",{
+                httpOnly: true,
+                secure:true,
+                sameSite:"none"
+            });
+            res.clearCookie("refreshToken",{
+                httpOnly: true,
+                secure:true,
+                sameSite:"none"
+            });
             res.json({msg:"LogOut successfuly", status:1});
         }
     }
