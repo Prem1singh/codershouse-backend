@@ -13,8 +13,9 @@ import cookieParser from 'cookie-parser';
 import RoomRouter from './Routers/RoomsRouter.js';
 app.use(cookieParser());
 app.use(cors({
-    origin: 'https://codershouse-frontend.vercel.app', // Frontend URL
-    credentials: true, // Allow sending cookies
+    origin: 'https://codershouse-frontend.vercel.app', // Allow this origin
+    methods: 'GET,POST,PUT,DELETE', // Specify allowed methods
+    credentials: true, // If cookies or authorization headers are needed
 }));
 app.use('/uploads',express.static('./uploads'));
 app.use(express.json({limit:'8mb'}));
